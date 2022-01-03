@@ -2,13 +2,16 @@
 #include <vector>
 class Tag {
 protected:
-    friend class Interpreter;
+    friend class Parser;
     unsigned int id;
     std::string name;
-    std::vector<std::pair<std::string, std::string>> attrs;
-    bool type;
+    bool type=0;
 };
-class Interpreter {
+class OpenTag : public Tag {
+protected:
+    std::vector<std::pair<std::string, std::string>> attrs;
+};
+class Parser {
 protected:
     static unsigned int tagsAm;
     std::vector<Tag> tags;
@@ -21,7 +24,7 @@ public:
         if(tag.type) {
         bool phase=0;
         for(signed int i=1;i<tagStr.size();i++) {
-            if(!f)tag.name+=(tagStr[i] == ' ' || tagStr[i] == '>')?f++:tagStr[i];
+            if(!phase)tag.name+=(tagStr[i] == ' ' || tagStr[i] == '>')?phase=1:tagStr[i];
             else {
 
             }
@@ -34,9 +37,9 @@ public:
         }
     }
 };
-unsigned int Interpreter::tagsAm = 0;
+unsigned int Parser::tagsAm = 0;
 int main() {
-    Interpreter interpreter;
-    interpreter.addTag("<tag-1 value=\"something-ekk\" type=\"someType\">");
+    Parser parser;
+    parser.addTag("<tag-1 value = \"some value\" type=\"someType\">");
     return 0;
 }
