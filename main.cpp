@@ -10,7 +10,7 @@ protected:
     std::vector<std::pair<std::string, std::string>> attrs;
     std::vector<Tag> children;
 public:
-    void insertAttr(std::pair<std::string, std::string> &attrRef) {
+    void insertAttr(const std::pair<std::string, std::string> &attrRef) {
         attrs.insert(std::lower_bound(attrs.begin(), attrs.end(), attrRef), attrRef);
     }
     void outputInfo() {
@@ -26,10 +26,10 @@ protected:
     static unsigned int tagsAmount;
     std::vector<Tag> tags;
 public:
-    void closeTag(std::string &tagNameRef) {
+    void closeTag(const std::string &tagNameRef) {
         //to do
     }
-    void addTag(std::string tagStr) {
+    void addTag(const std::string tagStr) {
         try {
         bool type=0;
         unsigned int id;
