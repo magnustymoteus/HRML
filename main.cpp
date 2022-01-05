@@ -73,7 +73,7 @@ int main() {
     parser.addTag("<tag-2 Sentence=\"A random sentence.\">");
     /*
     to do:
-    program closing tag, tags vector, tag query with binary search, nested tags
+    program closing tag, opening and closing tag same id, tags vector, tag query with binary search, nested tags
     */
     return 0;
 }
