@@ -18,7 +18,7 @@ public:
         for(auto i:attrs) {
             std::cout << i.first << ": " << i.second << std::endl;
         }
-        std::cout << "--------------------\n";
+        std::cout << "--------------------\n\n";
     }
 };
 class Parser {
@@ -47,7 +47,7 @@ public:
                 else if(c==2 && tagStr[i] != '\"' && tagStr[i]!='=') attr.second+=tagStr[i];
                 }
             }
-            tags.push_back(tag);
+            tags.push_back(tag); //change to insert (binary search)
         }
         else {
             std::string name;
