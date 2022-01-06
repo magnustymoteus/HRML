@@ -25,7 +25,26 @@ class Parser {
 protected:
     static unsigned int tagsAmount;
     std::vector<Tag> tags;
+    signed int currTagIndex = -1;
+    signed int bSearchTag(const std::string &tagNameRef, bool opt) {
+        signed int l=0,r=tags.size()-1,p;
+        while(l<=r) {
+            p=(l+r)/2;
+            if((tags[p].name==tagNameRef && !opt)) return p;
+            (tagNameRef>tags[p].name)?l=p+1:r=p-1;
+        }
+        return (!opt)?-1:r+1;
+    }
 public:
+    void printTags() {
+        for(auto tag : tags) {
+            std::cout << "'" << tag.name << "' ";
+        }
+    }
+    void insertTag(const Tag &tagRef) {
+        currTagIndex=bSearchTag(tagRef.name, 1);
+        tags.insert(tags.begin()+currTagIndex, tagRef);
+    }
     void closeTag(const std::string &tagNameRef) {
         //to do
     }
@@ -41,13 +60,16 @@ public:
         std::pair<std::string, std::string> attr;
         bool phase=0;
         for(signed int i=1, c=0;i<tagStr.size();((tagStr[i]=='='||tagStr[i]=='\"') && c<2)?c++,i++:(tagStr[i]=='\"')?c=0,tag.insertAttr(attr),attr={},i++:i++) {
-            if(!phase)tag.name+=(tagStr[i] == ' ' || tagStr[i] == '>')?'\0',phase++:tagStr[i];
+            if(!phase) {
+                if(tagStr[i] != ' ' && tagStr[i] != '>') tag.name+=tagStr[i];
+                else phase++;
+            }
             else {
                 if(!c && tagStr[i]!=' ' && tagStr[i]!='=')attr.first+=tagStr[i];
                 else if(c==2 && tagStr[i] != '\"' && tagStr[i]!='=') attr.second+=tagStr[i];
                 }
             }
-            tags.push_back(tag); //change to insert (binary search)
+            insertTag(tag);
         }
         else {
             std::string name;
@@ -69,8 +91,8 @@ int main() {
     unsigned int n;
     Parser parser;
     parser.addTag("<tag-1 value = \"some value\" type=\"someType\">");
-    parser.addTag("</tag-1>");
     parser.addTag("<tag-2 Sentence=\"A random sentence.\">");
+    parser.printTags();
     /*
     to do:
     program closing tag, opening and closing tag same id, tags vector, tag query with binary search, children tags, nested tags
