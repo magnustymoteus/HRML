@@ -63,7 +63,7 @@ public:
         for(signed int i=1, c=0;i<tagStr.size();((tagStr[i]=='='||tagStr[i]=='\"') && c<2)?c++,i++:(tagStr[i]=='\"')?c=0,tag.insertAttr(attr),attr={},i++:i++) {
             if(!phase) {
                 if(tagStr[i] != ' ' && tagStr[i] != '>') tag.name+=tagStr[i];
-                else phase++;
+                else phase=1;
             }
             else {
                 if(!c && tagStr[i]!=' ' && tagStr[i]!='=')attr.first+=tagStr[i];
@@ -93,7 +93,6 @@ int main() {
     parser.addTag("<tag-2 Sentence=\"A random sentence.\">");
     parser.addTag("</tag-2>");
     parser.addTag("</tag-1>");
-    parser.printTags();
     /*
     to do:
     program closing tag, opening and closing tag same id, tags vector, tag query with binary search, children tags, nested tags
