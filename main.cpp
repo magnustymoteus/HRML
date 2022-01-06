@@ -46,7 +46,8 @@ public:
         tags.insert(tags.begin()+currTagIndex, tagRef);
     }
     void closeTag(const std::string &tagNameRef) {
-        //to do
+        signed int tagIndex = bSearchTag(tagNameRef,0);
+        if(tagIndex!=-1) tags[tagIndex].closed=1;
     }
     void addTag(const std::string tagStr) {
         try {
@@ -73,9 +74,7 @@ public:
         }
         else {
             std::string name;
-            for(unsigned int i=1;i<tagStr.size();i++) {
-                if(tagStr[i] == ' ' || tagStr[i] == '>')name+=tagStr[i];
-            }
+            for(unsigned int i=2;i<tagStr.size()-1;i++) name+=tagStr[i];
             closeTag(name);
             }
         }
@@ -92,6 +91,8 @@ int main() {
     Parser parser;
     parser.addTag("<tag-1 value = \"some value\" type=\"someType\">");
     parser.addTag("<tag-2 Sentence=\"A random sentence.\">");
+    parser.addTag("</tag-2>");
+    parser.addTag("</tag-1>");
     parser.printTags();
     /*
     to do:
