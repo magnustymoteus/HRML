@@ -6,10 +6,18 @@ protected:
     friend class Parser;
     unsigned int id;
     std::string name;
-    bool closed=0;
     std::vector<std::pair<std::string, std::string>> attrs;
     std::vector<Tag> children;
 public:
+    signed int getAttr(const std::string keyStrArg) {
+        signed int l=0, r=attrs.size()-1, p;
+        while(l<=r) {
+            p=(l+r)/2;
+            if(attrs[p].first == keyStrArg) return p;
+            (keyStrArg>attrs[p].first)?l=p+1:r=p-1;
+        }
+        return -1;
+    }
     void insertAttr(const std::pair<std::string, std::string> &attrRef) {
         attrs.insert(std::lower_bound(attrs.begin(), attrs.end(), attrRef), attrRef);
     }
@@ -25,7 +33,9 @@ class Parser {
 protected:
     static unsigned int tagsAmount;
     std::vector<Tag> tags;
+    std::vector<Tag> tagLayers;
     signed int currTagIndex = -1;
+
     signed int bSearchTag(const std::string &tagNameRef, bool opt) {
         signed int l=0,r=tags.size()-1,p;
         while(l<=r) {
@@ -41,13 +51,19 @@ public:
             std::cout << "'" << tag.name << "' ";
         }
     }
-    void insertTag(const Tag &tagRef) {
-        currTagIndex=bSearchTag(tagRef.name, 1);
-        tags.insert(tags.begin()+currTagIndex, tagRef);
+    void printChildrenOf(std::string tagNameArg) {
+        Tag tag = tags[bSearchTag(tagNameArg, 0)];
+        for(auto childTag : tag.children) {
+            std::cout << childTag.name << " ";
+        }
     }
-    void closeTag(const std::string &tagNameRef) {
-        signed int tagIndex = bSearchTag(tagNameRef,0);
-        if(tagIndex!=-1) tags[tagIndex].closed=1;
+    void insertTag(const Tag &tagRef) {
+        if(tagLayers.size()) tags[bSearchTag(tagLayers[tagLayers.size()-1].name,0)].children.push_back(tagRef);
+        tagLayers.push_back(tagRef);
+        tags.insert(tags.begin()+bSearchTag(tagRef.name, 1), tagRef);
+    }
+    void closeTag() {
+        tagLayers.pop_back();
     }
     void addTag(const std::string tagStr) {
         try {
@@ -73,9 +89,7 @@ public:
             insertTag(tag);
         }
         else {
-            std::string name;
-            for(unsigned int i=2;i<tagStr.size()-1;i++) name+=tagStr[i];
-            closeTag(name);
+            closeTag();
             }
         }
 
@@ -87,15 +101,16 @@ public:
 };
 unsigned int Parser::tagsAmount = 0;
 int main() {
-    unsigned int n;
     Parser parser;
     parser.addTag("<tag-1 value = \"some value\" type=\"someType\">");
     parser.addTag("<tag-2 Sentence=\"A random sentence.\">");
     parser.addTag("</tag-2>");
+    parser.addTag("<tag-3 ab = \"a\" bc=\"c\" ba = \"b\">");
+    parser.addTag("</tag-3>");
     parser.addTag("</tag-1>");
     /*
     to do:
-    program closing tag, opening and closing tag same id, tags vector, tag query with binary search, children tags, nested tags
+    opening and closing tag same id, tag query system, clean and shorten unnecessary code
     */
     return 0;
 }
