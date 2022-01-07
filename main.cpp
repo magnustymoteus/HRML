@@ -108,6 +108,7 @@ int main() {
     parser.addTag("<tag-3 ab = \"a\" bc=\"c\" ba = \"b\">");
     parser.addTag("</tag-3>");
     parser.addTag("</tag-1>");
+    parser.printChildrenOf("tag-1");
     /*
     to do:
     opening and closing tag same id, tag query system, clean and shorten unnecessary code
