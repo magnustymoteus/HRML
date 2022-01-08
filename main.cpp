@@ -46,6 +46,39 @@ protected:
         return (!opt)?-1:r+1;
     }
 public:
+    void initializeInput() {
+        signed int inputs, queries;
+        std::string inputStr, queryStr;
+        std::cin >> inputs >> queries;
+        while(inputs--) {std::cin >> inputStr; addTag(inputStr);}
+        while(queries--) {std::cin >> queryStr; std::cout << query(queryStr) << std::endl;}
+    }
+    std::string query(const std::string queryStrArg) {
+        //fix this function
+        Tag currTag;
+        std::string prevStr, nextStr;
+        char op;
+        bool s=0;
+        for(signed int i=0;i<queryStrArg.size();i++) {
+            if((queryStrArg[i]!='.' && queryStrArg[i]!='~')) {
+               ((!s)?prevStr:nextStr)+=queryStrArg[i];
+            }
+            else {
+                s^=1;
+                std::cout << s << queryStrArg[i] << " ";
+                if(nextStr.size() && op=='.') {
+                    std::cout << prevStr << '/' << nextStr << " ";
+                    currTag = tags[bSearchTag(tags, prevStr, 0)];
+                    signed int resNum = bSearchTag(currTag.children, nextStr, 0);
+                    if(resNum==-1) return "Not Found!";
+                    currTag = currTag.children[resNum];
+                    prevStr = currTag.name, nextStr.clear();
+                }
+                op = queryStrArg[i];
+            }
+        }
+        return "";
+    }
     void insertTag(const Tag &tagRef) {
         if(tagLayers.size()) {
             Tag &parentTagRef = tags[bSearchTag(tags, tagLayers[tagLayers.size()-1].name,0)];
@@ -93,16 +126,17 @@ public:
 unsigned int Parser::tagsAmount = 0;
 int main() {
     Parser parser;
-    parser.addTag("<tag-1 value = \"some value\" type=\"someType\">");
-    parser.addTag("<tag-3 Sentence=\"A random sentence.\">");
+    parser.addTag("<tag-1>");
+    parser.addTag("<tag-2>");
+    parser.addTag("<tag-3 attr=\"something\">");
     parser.addTag("</tag-3>");
-    parser.addTag("<tag-2 attribute = \"someAttribute\" bc=\"c\" ba = \"b\">");
     parser.addTag("</tag-2>");
     parser.addTag("</tag-1>");
-    parser.specifyIQ();
+    parser.query("tag-1.tag-2.tag-3~attr");
+    //parser.initializeInput();
     /*
     to do:
-    tag query system, clean and shorten unnecessary code
+    clean and shorten unnecessary code
     */
     return 0;
 }
