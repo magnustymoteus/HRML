@@ -2,7 +2,7 @@
 #include <vector>
 
 class Tag {
-protected:
+public:
     friend class Parser;
     unsigned int id;
     std::string name;
@@ -30,13 +30,13 @@ public:
     }
 };
 class Parser {
-protected:
+public:
     static unsigned int tagsAmount;
     std::vector<Tag> tags;
     std::vector<Tag> tagLayers;
-    signed int currTagIndex = -1;
 
-    signed int bSearchTag(std::vector<Tag> &tagVectorRef, const std::string &tagNameRef, bool opt) {
+public:
+     signed int bSearchTag(std::vector<Tag> &tagVectorRef, const std::string &tagNameRef, bool opt) {
         signed int l=0,r=tagVectorRef.size()-1,p;
         while(l<=r) {
             p=(l+r)/2;
@@ -45,47 +45,46 @@ protected:
         }
         return (!opt)?-1:r+1;
     }
-public:
     void initializeInput() {
-        signed int inputs, queries;
         std::string inputStr, queryStr;
-        std::cin >> inputs >> queries;
-        while(inputs--) {std::cin >> inputStr; addTag(inputStr);}
-        while(queries--) {std::cin >> queryStr; std::cout << query(queryStr) << std::endl;}
+        signed int inputsNum, queriesNum;
+        std::cin >> inputsNum >> queriesNum;
+        std::cin.ignore();
+        while(inputsNum--) {std::getline(std::cin, inputStr); addTag(inputStr);}
+        while(queriesNum--) {std::getline(std::cin, queryStr); std::cout << query(queryStr) << std::endl;}
     }
     std::string query(const std::string queryStrArg) {
-        //fix this function
         Tag currTag;
-        std::string prevStr, nextStr;
+        std::string str;
         char op;
-        bool s=0;
         for(signed int i=0;i<queryStrArg.size();i++) {
-            if((queryStrArg[i]!='.' && queryStrArg[i]!='~')) {
-               ((!s)?prevStr:nextStr)+=queryStrArg[i];
-            }
+            //std::cout << str << std::endl;
+            if(queryStrArg[i]!='.' && queryStrArg[i]!='~') str+=queryStrArg[i];
             else {
-                s^=1;
-                std::cout << s << queryStrArg[i] << " ";
-                if(nextStr.size() && op=='.') {
-                    std::cout << prevStr << '/' << nextStr << " ";
-                    currTag = tags[bSearchTag(tags, prevStr, 0)];
-                    signed int resNum = bSearchTag(currTag.children, nextStr, 0);
+                if(!op) {
+                    signed int resNum = bSearchTag(tags, str, 0);
+                    if(resNum==-1) return "Not Found!";
+                    currTag = tags[resNum];
+                }
+                else if(op=='.') {
+                    signed int resNum = bSearchTag(currTag.children, str, 0);
                     if(resNum==-1) return "Not Found!";
                     currTag = currTag.children[resNum];
-                    prevStr = currTag.name, nextStr.clear();
                 }
+                str.clear();
                 op = queryStrArg[i];
             }
+            }
+            signed int resNum = currTag.getAttr(str);
+            return (resNum==-1)? "Not Found!" : currTag.attrs[resNum].second;
         }
-        return "";
-    }
     void insertTag(const Tag &tagRef) {
         if(tagLayers.size()) {
-            Tag &parentTagRef = tags[bSearchTag(tags, tagLayers[tagLayers.size()-1].name,0)];
+            Tag &parentTagRef = tagLayers[tagLayers.size()-1];
             parentTagRef.children.insert(parentTagRef.children.begin()+bSearchTag(parentTagRef.children, tagRef.name, 1), tagRef);
         }
+        else tags.insert(tags.begin()+bSearchTag(tags, tagRef.name, 1), tagRef);
         tagLayers.push_back(tagRef);
-        tags.insert(tags.begin()+bSearchTag(tags, tagRef.name, 1), tagRef);
     }
     void closeTag() {
         tagLayers.pop_back();
@@ -126,17 +125,10 @@ public:
 unsigned int Parser::tagsAmount = 0;
 int main() {
     Parser parser;
-    parser.addTag("<tag-1>");
-    parser.addTag("<tag-2>");
-    parser.addTag("<tag-3 attr=\"something\">");
-    parser.addTag("</tag-3>");
-    parser.addTag("</tag-2>");
-    parser.addTag("</tag-1>");
-    parser.query("tag-1.tag-2.tag-3~attr");
-    //parser.initializeInput();
+   parser.initializeInput();
     /*
     to do:
-    clean and shorten unnecessary code
+    fix query and insertTag member methods (know the last parent tag), clean and shorten unnecessary code
     */
     return 0;
 }
