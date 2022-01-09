@@ -58,7 +58,6 @@ public:
         std::string str;
         char op;
         for(signed int i=0;i<queryStrArg.size();i++) {
-            //std::cout << str << std::endl;
             if(queryStrArg[i]!='.' && queryStrArg[i]!='~') str+=queryStrArg[i];
             else {
                 if(!op) {
