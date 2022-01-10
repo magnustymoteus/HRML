@@ -6,7 +6,7 @@ public:
     friend class Parser;
     unsigned int id;
     std::string name;
-    std::vector<std::pair<std::string, std::string>> attrs;
+    std::vector<std::shared_ptr<std::pair<std::string, std::string>>> attrs;
     std::vector<std::shared_ptr<Tag>> children;
     std::shared_ptr<Tag> parentTagPtr;
     Tag(std::string nameArg) : name(nameArg) {}
@@ -16,18 +16,18 @@ public:
         signed int l=0, r=attrs.size()-1, p;
         while(l<=r) {
             p=(l+r)/2;
-            if(attrs[p].first == keyStrArg) return p;
-            (keyStrArg>attrs[p].first)?l=p+1:r=p-1;
+            if(attrs[p]->first == keyStrArg) return p;
+            (keyStrArg>attrs[p]->first)?l=p+1:r=p-1;
         }
         return -1;
     }
-    void insertAttr(const std::pair<std::string, std::string> &attrRef) {
+    void insertAttr(const std::shared_ptr<std::pair<std::string, std::string>> attrRef) {
         attrs.insert(std::lower_bound(attrs.begin(), attrs.end(), attrRef), attrRef);
     }
     void outputInfo() {
         std::cout << name << "(ID " << id << ")" << std::endl << "--------------------\n";
         for(auto i:attrs) {
-            std::cout << i.first << ": " << i.second << std::endl;
+            std::cout << i->first << ": " << i->second << std::endl;
         }
         std::cout << "--------------------\n\n";
     }
@@ -95,7 +95,7 @@ public:
             }
         }
             signed int resNum = currTag->getAttr(str);
-            return (resNum==-1)? "Not Found!" : currTag->attrs[resNum].second;
+            return (resNum==-1)? "Not Found!" : currTag->attrs[resNum]->second;
         }
     void insertTag(std::shared_ptr<Tag> tagRef) {
         if(tagLayerPtrs.size()) {
@@ -116,7 +116,7 @@ public:
         if(type) {
         std::shared_ptr<Tag> tag(new Tag);
         tag->id = tagsAmount++;
-        std::pair<std::string, std::string> attr;
+        std::shared_ptr<std::pair<std::string, std::string>> attr;
         bool phase=0;
         for(signed int i=1, c=0;i<tagStr.size();((tagStr[i]=='='||tagStr[i]=='\"') && c<2)?c++,i++:(tagStr[i]=='\"')?c=0,tag->insertAttr(attr),attr={},i++:i++) {
             if(!phase) {
@@ -124,8 +124,8 @@ public:
                 else phase=1;
             }
             else {
-                if(!c && tagStr[i]!=' ' && tagStr[i]!='=')attr.first+=tagStr[i];
-                else if(c==2 && tagStr[i] != '\"' && tagStr[i]!='=') attr.second+=tagStr[i];
+                if(!c && tagStr[i]!=' ' && tagStr[i]!='=')attr->first+=tagStr[i];
+                else if(c==2 && tagStr[i] != '\"' && tagStr[i]!='=') attr->second+=tagStr[i];
                 }
             }
             insertTag(tag);
