@@ -146,7 +146,7 @@ int main() {
    parser.initializeInput();
     /*
     to do:
-    fix tag having same memory addresses, clean and shorten unnecessary code
+    clean and shorten unnecessary code
     */
     return 0;
 }
